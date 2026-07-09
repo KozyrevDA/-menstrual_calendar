@@ -8,24 +8,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.kozyrevda.menstrualcalendar.theme.LunaColors
-import com.kozyrevda.menstrualcalendar.theme.LunaTheme
+import com.kozyrevda.menstrualcalendar.theme.AppColors
+import com.kozyrevda.menstrualcalendar.theme.AppTheme
 
 @Composable
 fun App() {
-    LunaTheme {
+    AppTheme {
         Column(
             Modifier
                 .fillMaxSize()
-                .background(LunaColors.bg)
+                .background(AppColors.bg)
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -33,16 +32,14 @@ fun App() {
         ) {
             Text(
                 "Луна — календарь цикла",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Black,
-                color = LunaColors.ink,
+                style = MaterialTheme.typography.headlineLarge,
+                color = AppColors.ink,
                 textAlign = TextAlign.Center,
             )
             Text(
                 "Забота о вас каждый день цикла",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = LunaColors.sub,
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppColors.sub,
                 textAlign = TextAlign.Center,
             )
         }
