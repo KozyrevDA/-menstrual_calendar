@@ -78,7 +78,11 @@ fun HomeScreen(onOpen: (Screen) -> Unit) {
                         Box(Modifier.size(46.dp).clip(CircleShape).background(AppColors.roseLight), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("${next.dayOfMonth}", fontSize = 16.sp, fontWeight = FontWeight.Black, color = AppColors.roseDark)
-                                Text(MONTHS_SHORT[next.monthNumber - 1].lowercase(), fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = AppColors.roseDark)
+                                Text(
+                                    MONTHS_SHORT[next.monthNumber - 1].lowercase(),
+                                    fontSize = 9.sp, fontWeight = FontWeight.ExtraBold,
+                                    color = AppColors.roseDark,
+                                )
                             }
                         }
                         Column {
@@ -94,10 +98,13 @@ fun HomeScreen(onOpen: (Screen) -> Unit) {
         }
 
         // ── карточки-переходы ──
-        NavCard("К", AppColors.roseLight, AppColors.roseDark, "Календарь", "Месячные, овуляция и фертильные дни") { onOpen(Screen.Calendar) }
-        NavCard("С", AppColors.peachLight, AppColors.peachInk, "Симптомы", "Отметить самочувствие и настроение") { onOpen(Screen.LogSymptoms()) }
+        NavCard("К", AppColors.roseLight, AppColors.roseDark, "Календарь",
+            "Месячные, овуляция и фертильные дни") { onOpen(Screen.Calendar) }
+        NavCard("С", AppColors.peachLight, AppColors.peachInk, "Симптомы",
+            "Отметить самочувствие и настроение") { onOpen(Screen.LogSymptoms()) }
         NavCard("№", AppColors.greenLight, AppColors.green, "Таблетки", "Блистер 21+7 и напоминания") { onOpen(Screen.Pills) }
-        NavCard("Л", AppColors.roseLight, AppColors.roseDark, "Луна — чат", "Подружка и психолог · всегда рядом") { onOpen(Screen.LunaChat) }
+        NavCard("Л", AppColors.roseLight, AppColors.roseDark, "Луна — чат",
+            "Подружка и психолог · всегда рядом") { onOpen(Screen.LunaChat) }
 
         // ── CTA premium ──
         if (!AppStateHolder.isPremium) Box(

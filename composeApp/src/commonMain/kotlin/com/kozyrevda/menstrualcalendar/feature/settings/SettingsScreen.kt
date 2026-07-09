@@ -55,7 +55,10 @@ fun SettingsScreen(onDataDeleted: () -> Unit = {}) {
             .padding(horizontal = 20.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("Настройки", style = MaterialTheme.typography.headlineMedium, color = AppColors.ink, modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp))
+        Text(
+            "Настройки", style = MaterialTheme.typography.headlineMedium, color = AppColors.ink,
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp),
+        )
 
         // ── цикл ──
         Group("Цикл") {
@@ -110,7 +113,11 @@ fun SettingsScreen(onDataDeleted: () -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Text("Точно удалить всё?", style = MaterialTheme.typography.titleSmall.copy(fontSize = 14.5.sp), color = AppColors.roseDark, modifier = Modifier.weight(1f))
+                    Text(
+                        "Точно удалить всё?",
+                        style = MaterialTheme.typography.titleSmall.copy(fontSize = 14.5.sp),
+                        color = AppColors.roseDark, modifier = Modifier.weight(1f),
+                    )
                     PillButton("Отмена", filled = false) { confirmDelete = false }
                     PillButton("Удалить", filled = true) {
                         AppStateHolder.clearAll()
@@ -122,7 +129,9 @@ fun SettingsScreen(onDataDeleted: () -> Unit = {}) {
         }
 
         Text(
-            "Прогнозы носят ориентировочный характер и не являются медицинской рекомендацией или методом контрацепции. Данные хранятся только на этом устройстве.",
+            "Прогнозы носят ориентировочный характер и не являются медицинской " +
+                "рекомендацией или методом контрацепции. " +
+                "Данные хранятся только на этом устройстве.",
             style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp), color = AppColors.subLight,
             modifier = Modifier.padding(horizontal = 6.dp),
         )

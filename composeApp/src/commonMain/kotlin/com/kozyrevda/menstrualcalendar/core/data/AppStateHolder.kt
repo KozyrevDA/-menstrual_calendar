@@ -21,7 +21,8 @@ object AppStateHolder {
 
     private val chatGreeting = ChatMessage(
         ChatMessage.Role.Luna,
-        "Привет! Это Луна. Как ты себя чувствуешь сегодня? Расскажи про настроение, тревогу, ПМС — что угодно, я рядом.",
+        "Привет! Это Луна. Как ты себя чувствуешь сегодня? " +
+            "Расскажи про настроение, тревогу, ПМС — что угодно, я рядом.",
     )
 
     var cycleSettings: CycleSettings? by mutableStateOf(null)

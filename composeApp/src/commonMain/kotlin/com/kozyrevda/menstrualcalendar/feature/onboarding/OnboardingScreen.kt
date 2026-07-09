@@ -123,7 +123,8 @@ fun OnboardingScreen(onFinish: (CycleSettings) -> Unit) {
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Text(
-                            "Если цикл нерегулярный — не страшно: прогноз будет уточняться с каждым месяцем.",
+                            "Если цикл нерегулярный — не страшно: " +
+                                "прогноз будет уточняться с каждым месяцем.",
                             style = MaterialTheme.typography.labelMedium, color = AppColors.peachText, lineHeight = 18.sp,
                         )
                     }
@@ -168,9 +169,18 @@ private fun IntroStep() {
     }
     Spacer(Modifier.height(6.dp))
     listOf(
-        Triple("28", AppColors.roseLight to AppColors.roseDark, "Календарь и прогнозы" to "Месячные, овуляция и фертильные дни"),
-        Triple("Л", AppColors.peachLight to AppColors.peachInk, "Луна — подружка и психолог" to "Поддержка в любой день цикла"),
-        Triple("✓", AppColors.greenLight to AppColors.green, "Напоминания о таблетках" to "Вовремя и незаметно для посторонних"),
+        Triple(
+            "28", AppColors.roseLight to AppColors.roseDark,
+            "Календарь и прогнозы" to "Месячные, овуляция и фертильные дни",
+        ),
+        Triple(
+            "Л", AppColors.peachLight to AppColors.peachInk,
+            "Луна — подружка и психолог" to "Поддержка в любой день цикла",
+        ),
+        Triple(
+            "✓", AppColors.greenLight to AppColors.green,
+            "Напоминания о таблетках" to "Вовремя и незаметно для посторонних",
+        ),
     ).forEach { (glyph, colors, texts) ->
         LunaCard(corner = AppShapes.cardSmall) {
             Row(

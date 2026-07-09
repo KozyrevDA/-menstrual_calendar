@@ -136,7 +136,10 @@ private fun CourseContent(course: PillCourse, t: LocalDate) {
                                 "Новая упаковка через $left ${daysWord(left)}"
                             }
                             takenToday -> "Следующая — завтра в ${course.reminderTime}"
-                            else -> "Напомним в ${course.reminderTime} · осталось ${course.activePills - todayInfo.packDay + 1} в упаковке"
+                            else -> {
+                                val left = course.activePills - todayInfo.packDay + 1
+                                "Напомним в ${course.reminderTime} · осталось $left в упаковке"
+                            }
                         },
                         style = MaterialTheme.typography.bodySmall, color = AppColors.sub,
                     )
@@ -168,7 +171,10 @@ private fun CourseContent(course: PillCourse, t: LocalDate) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
                 Text("Текущая упаковка", style = MaterialTheme.typography.titleMedium, color = AppColors.ink, modifier = Modifier.weight(1f))
-                Text("${course.activePills} + ${course.breakDays} · день ${todayInfo.packDay}", style = MaterialTheme.typography.bodySmall, color = AppColors.sub)
+                Text(
+                    "${course.activePills} + ${course.breakDays} · день ${todayInfo.packDay}",
+                    style = MaterialTheme.typography.bodySmall, color = AppColors.sub,
+                )
             }
             val pack = PillLogic.generatePack(course, taken, t)
             pack.chunked(7).forEach { row ->
