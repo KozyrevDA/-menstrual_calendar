@@ -1,0 +1,51 @@
+package com.kozyrevda.menstrualcalendar.navigation
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import com.kozyrevda.menstrualcalendar.feature.calendar.CalendarScreen
+import com.kozyrevda.menstrualcalendar.feature.chat.LunaChatScreen
+import com.kozyrevda.menstrualcalendar.feature.common.LunaBottomBar
+import com.kozyrevda.menstrualcalendar.feature.home.HomeScreen
+import com.kozyrevda.menstrualcalendar.feature.log.LogSymptomsScreen
+import com.kozyrevda.menstrualcalendar.feature.onboarding.OnboardingScreen
+import com.kozyrevda.menstrualcalendar.feature.paywall.PaywallScreen
+import com.kozyrevda.menstrualcalendar.feature.pills.PillsScreen
+import com.kozyrevda.menstrualcalendar.feature.settings.SettingsScreen
+import com.kozyrevda.menstrualcalendar.feature.stats.StatsScreen
+
+/**
+ * State-based навигация: when по Navigator.current.
+ * Онбординг — стартовый экран; флаг «пройден» подключим на этапе хранилища.
+ */
+@Composable
+fun AppNavigation() {
+    val navigator = remember { Navigator(start = Screen.Onboarding) }
+    val current = navigator.current
+    val showBottomBar = current in Screen.tabs
+
+    Column(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(1f)) {
+            when (current) {
+                Screen.Onboarding -> OnboardingScreen(onFinish = { navigator.replaceAll(Screen.Home) })
+                Screen.Home -> HomeScreen(onOpen = navigator::navigate)
+                Screen.Calendar -> CalendarScreen()
+                Screen.Stats -> StatsScreen()
+                Screen.Settings -> SettingsScreen()
+                is Screen.LogSymptoms -> LogSymptomsScreen(onBack = navigator::back)
+                Screen.Pills -> PillsScreen(onBack = navigator::back)
+                Screen.LunaChat -> LunaChatScreen(onBack = navigator::back)
+                Screen.Paywall -> PaywallScreen(onBack = navigator::back)
+            }
+        }
+        if (showBottomBar) {
+            LunaBottomBar(
+                labels = Screen.tabs.map { it.tabLabel to (it == current) },
+                onSelect = { navigator.switchTab(Screen.tabs[it]) },
+            )
+        }
+    }
+}
