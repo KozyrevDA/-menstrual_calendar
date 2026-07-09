@@ -32,11 +32,13 @@ fun AppNavigation() {
             when (current) {
                 Screen.Onboarding -> OnboardingScreen(
                     onFinish = { settings ->
-                        AppStateHolder.completeOnboarding(settings)
+                        AppStateHolder.saveCycleSettings(settings)
                         navigator.replaceAll(Screen.Home)
                     }
                 )
-                Screen.Home -> HomeScreen(appState = appState, onOpen = navigator::navigate)
+                Screen.Home -> HomeScreen(onOpen = { screen ->
+                    if (screen in Screen.tabs) navigator.switchTab(screen) else navigator.navigate(screen)
+                })
                 Screen.Calendar -> CalendarScreen()
                 Screen.Stats -> StatsScreen()
                 Screen.Settings -> SettingsScreen()
