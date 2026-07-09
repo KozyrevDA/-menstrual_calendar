@@ -1,6 +1,9 @@
 package com.kozyrevda.menstrualcalendar.feature.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +62,14 @@ fun Cta(label: String, enabled: Boolean = true, onClick: () -> Unit) {
             .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) { Text(label, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = Color.White) }
+}
+
+/** Текстовая «призрачная» кнопка. */
+@Composable
+fun GhostButton(label: String, onClick: () -> Unit) {
+    Box(Modifier.fillMaxWidth().noRippleClick(onClick).padding(6.dp), contentAlignment = Alignment.Center) {
+        Text(label, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = AppColors.roseDark)
+    }
 }
 
 /** Стрелка «назад». */
@@ -125,3 +136,43 @@ fun LunaBottomBar(
         }
     }
 }
+
+/** Радио-строка квиза: розовая подложка и кольцо-индикатор при выборе. */
+@Composable
+fun RadioRow(label: String, on: Boolean, onClick: () -> Unit) {
+    val shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(if (on) AppColors.roseLight else AppColors.surface)
+            .border(
+                width = if (on) 2.dp else 1.5.dp,
+                color = if (on) AppColors.rose else AppColors.border,
+                shape = shape,
+            )
+            .noRippleClick(onClick)
+            .padding(horizontal = 18.dp, vertical = 15.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(
+            Modifier
+                .size(22.dp)
+                .clip(CircleShape)
+                .background(AppColors.surface)
+                .border(
+                    width = if (on) 7.dp else 2.dp,
+                    color = if (on) AppColors.rose else AppColors.ghost,
+                    shape = CircleShape,
+                )
+        )
+        Text(
+            label, fontSize = 15.sp,
+            fontWeight = if (on) FontWeight.ExtraBold else FontWeight.Bold,
+            color = if (on) AppColors.roseDark else AppColors.ink,
+        )
+    }
+}
+
+/** Прозрачная текстовая кнопка. */

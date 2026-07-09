@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.kozyrevda.menstrualcalendar.core.data.AppStateHolder
 import com.kozyrevda.menstrualcalendar.feature.calendar.CalendarScreen
 import com.kozyrevda.menstrualcalendar.feature.chat.LunaChatScreen
 import com.kozyrevda.menstrualcalendar.feature.common.LunaBottomBar
@@ -17,21 +18,25 @@ import com.kozyrevda.menstrualcalendar.feature.pills.PillsScreen
 import com.kozyrevda.menstrualcalendar.feature.settings.SettingsScreen
 import com.kozyrevda.menstrualcalendar.feature.stats.StatsScreen
 
-/**
- * State-based навигация: when по Navigator.current.
- * Онбординг — стартовый экран; флаг «пройден» подключим на этапе хранилища.
- */
+/** State-based навигация: when по Navigator.current. */
 @Composable
 fun AppNavigation() {
-    val navigator = remember { Navigator(start = Screen.Onboarding) }
+    val navigator = remember {
+        Navigator(start = if (AppStateHolder.isOnboarded) Screen.Home else Screen.Onboarding)
+    }
     val current = navigator.current
     val showBottomBar = current in Screen.tabs
 
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f)) {
             when (current) {
-                Screen.Onboarding -> OnboardingScreen(onFinish = { navigator.replaceAll(Screen.Home) })
-                Screen.Home -> HomeScreen(onOpen = navigator::navigate)
+                Screen.Onboarding -> OnboardingScreen(
+                    onFinish = { settings ->
+                        AppStateHolder.completeOnboarding(settings)
+                        navigator.replaceAll(Screen.Home)
+                    }
+                )
+                Screen.Home -> HomeScreen(appState = appState, onOpen = navigator::navigate)
                 Screen.Calendar -> CalendarScreen()
                 Screen.Stats -> StatsScreen()
                 Screen.Settings -> SettingsScreen()
