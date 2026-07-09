@@ -100,7 +100,7 @@ fun HomeScreen(onOpen: (Screen) -> Unit) {
         NavCard("Л", AppColors.roseLight, AppColors.roseDark, "Луна — чат", "Подружка и психолог · всегда рядом") { onOpen(Screen.LunaChat) }
 
         // ── CTA premium ──
-        Box(
+        if (!AppStateHolder.isPremium) Box(
             Modifier.fillMaxWidth().clip(AppShapes.cardSmall).background(AppColors.roseLight)
                 .noRippleClick { onOpen(Screen.Paywall) }
                 .padding(horizontal = 20.dp, vertical = 18.dp)

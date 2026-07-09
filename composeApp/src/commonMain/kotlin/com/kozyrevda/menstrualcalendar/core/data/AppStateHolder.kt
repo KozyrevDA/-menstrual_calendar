@@ -35,7 +35,14 @@ object AppStateHolder {
     var pillCourse: PillCourse? by mutableStateOf(null)
     var pillsTaken: Set<LocalDate> by mutableStateOf(emptySet())
 
+    /** Premium: пока UI-заглушка без реального billing. */
+    var isPremium: Boolean by mutableStateOf(false)
+
     val isOnboarded: Boolean get() = cycleSettings != null
+
+    fun activatePremiumStub() {
+        isPremium = true
+    }
 
     fun saveCycleSettings(settings: CycleSettings) {
         cycleSettings = settings
