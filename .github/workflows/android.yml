@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,13 +25,35 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Unit tests
-        run: ./gradlew :composeApp:testDebugUnitTest
+        run: |
+          set -o pipefail
+          ./gradlew :composeApp:testDebugUnitTest --stacktrace 2>&1 | tee build-tests.log
 
       - name: Build debug APK
-        run: ./gradlew :composeApp:assembleDebug
+        run: |
+          set -o pipefail
+          ./gradlew :composeApp:assembleDebug 2>&1 | tee build-apk.log
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: luna-debug-apk
           path: composeApp/build/outputs/apk/debug/*.apk
+
+      - name: Report failure as commit comment
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### CI failure — key errors'
+            echo '```'
+            grep -E "^e: |error:|> Task .* FAILED|What went wrong|Caused by:|Unresolved reference|expecting" \
+              -h build-*.log 2>/dev/null | head -c 5000 || true
+            echo
+            echo '--- tail ---'
+            tail -c 2500 build-*.log 2>/dev/null || true
+            echo '```'
+          } > report.md
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            -f body="$(cat report.md)" || true
