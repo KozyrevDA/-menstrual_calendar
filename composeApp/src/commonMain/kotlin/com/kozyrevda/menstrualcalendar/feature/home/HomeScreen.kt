@@ -32,11 +32,12 @@ import com.kozyrevda.menstrualcalendar.core.data.AppStateHolder
 import com.kozyrevda.menstrualcalendar.core.logic.CyclePredictor
 import com.kozyrevda.menstrualcalendar.core.logic.MONTHS_SHORT
 import com.kozyrevda.menstrualcalendar.core.logic.daysWord
+import com.kozyrevda.menstrualcalendar.core.logic.statusSubtitle
+import com.kozyrevda.menstrualcalendar.core.logic.statusTitle
 import com.kozyrevda.menstrualcalendar.core.logic.rus
 import com.kozyrevda.menstrualcalendar.core.logic.today
 import com.kozyrevda.menstrualcalendar.core.logic.weekdayFull
 import com.kozyrevda.menstrualcalendar.core.model.CycleDayInfo
-import com.kozyrevda.menstrualcalendar.core.model.CyclePhase
 import com.kozyrevda.menstrualcalendar.feature.common.LunaCard
 import com.kozyrevda.menstrualcalendar.feature.common.noRippleClick
 import com.kozyrevda.menstrualcalendar.navigation.Screen
@@ -181,20 +182,4 @@ private fun NavCard(glyph: String, glyphBg: Color, glyphFg: Color, title: String
             Text("›", style = MaterialTheme.typography.titleMedium, color = AppColors.chevron)
         }
     }
-}
-
-/** Статус дня: месячные / овуляция / фертильные дни / до месячных N дней. */
-private fun CycleDayInfo.statusTitle(): String = when {
-    isPeriod -> "Месячные"
-    isOvulation -> "Овуляция"
-    isFertile -> "Фертильные дни"
-    phase == CyclePhase.Follicular -> "Фолликулярная фаза"
-    else -> "До месячных $daysUntilNextPeriod ${daysWord(daysUntilNextPeriod)}"
-}
-
-private fun CycleDayInfo.statusSubtitle(): String = when {
-    isPeriod -> "День $cycleDay месячных — берегите себя"
-    isOvulation || isFertile -> "Высокая вероятность зачатия"
-    phase == CyclePhase.Follicular -> "Низкая вероятность зачатия"
-    else -> "Лютеиновая фаза · месячные через $daysUntilNextPeriod ${daysWord(daysUntilNextPeriod)}"
 }
