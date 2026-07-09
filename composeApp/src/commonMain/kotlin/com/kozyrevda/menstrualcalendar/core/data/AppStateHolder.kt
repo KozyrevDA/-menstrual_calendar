@@ -25,6 +25,10 @@ object AppStateHolder {
             "Расскажи про настроение, тревогу, ПМС — что угодно, я рядом.",
     )
 
+    /** Пройден ли онбординг (явный персистентный флаг). */
+    var onboardingCompleted: Boolean by mutableStateOf(false)
+        private set
+
     var cycleSettings: CycleSettings? by mutableStateOf(null)
         private set
 
@@ -57,7 +61,7 @@ object AppStateHolder {
     var privateMode: Boolean by mutableStateOf(false)
         private set
 
-    val isOnboarded: Boolean get() = cycleSettings != null
+    val isOnboarded: Boolean get() = onboardingCompleted
 
     init {
         restore()
@@ -65,6 +69,14 @@ object AppStateHolder {
 
     /* ── мутации (каждая сохраняется) ── */
 
+    /** Завершение онбординга: сохраняет настройки и поднимает флаг. */
+    fun completeOnboarding(settings: CycleSettings) {
+        cycleSettings = settings
+        onboardingCompleted = true
+        persist()
+    }
+
+    /** Правка параметров цикла из настроек (флаг онбординга не трогает). */
     fun saveCycleSettings(settings: CycleSettings) {
         cycleSettings = settings
         persist()
@@ -104,6 +116,7 @@ object AppStateHolder {
 
     /** Полное удаление данных: состояние как при первом запуске. */
     fun clearAll() {
+        onboardingCompleted = false
         cycleSettings = null
         dayLogs.clear()
         pillCourse = null
@@ -128,6 +141,7 @@ object AppStateHolder {
     /* ── персистентность ── */
 
     private fun snapshot() = PersistentStore.Snapshot(
+        onboardingCompleted = onboardingCompleted,
         cycleSettings = cycleSettings,
         dayLogs = dayLogs.entries.associate { it.key.toString() to it.value },
         pillCourse = pillCourse,
@@ -144,6 +158,8 @@ object AppStateHolder {
 
     private fun restore() {
         val s = store.load()
+        // миграция со старых снапшотов: раньше факт онбординга выводился из наличия настроек
+        onboardingCompleted = s.onboardingCompleted || s.cycleSettings != null
         cycleSettings = s.cycleSettings
         dayLogs.clear()
         s.dayLogs.forEach { (k, v) ->

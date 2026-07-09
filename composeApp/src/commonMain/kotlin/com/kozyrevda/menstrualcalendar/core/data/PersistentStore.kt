@@ -19,6 +19,7 @@ class PersistentStore {
 
     @Serializable
     data class Snapshot(
+        val onboardingCompleted: Boolean = false,
         val cycleSettings: CycleSettings? = null,
         val dayLogs: Map<String, DayLog> = emptyMap(),
         val pillCourse: PillCourse? = null,

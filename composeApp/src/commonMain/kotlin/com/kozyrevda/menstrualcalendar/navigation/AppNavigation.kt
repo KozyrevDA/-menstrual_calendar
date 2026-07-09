@@ -35,7 +35,7 @@ fun AppNavigation() {
             when (current) {
                 Screen.Onboarding -> OnboardingScreen(
                     onFinish = { settings ->
-                        AppStateHolder.saveCycleSettings(settings)
+                        AppStateHolder.completeOnboarding(settings)
                         navigator.replaceAll(Screen.Home)
                     }
                 )
