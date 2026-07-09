@@ -74,20 +74,20 @@ fun SettingsScreen(onDataDeleted: () -> Unit = {}) {
         // ── напоминания ──
         Group("Напоминания") {
             SettingRow("Приближение месячных", "За 2 дня, в 9:00") {
-                LunaToggle(AppStateHolder.remindPeriod) { AppStateHolder.remindPeriod = !AppStateHolder.remindPeriod }
+                LunaToggle(AppStateHolder.remindPeriod) { AppStateHolder.toggleRemindPeriod() }
             }
             SettingRow("День овуляции", "В день овуляции, в 9:00") {
-                LunaToggle(AppStateHolder.remindOvulation) { AppStateHolder.remindOvulation = !AppStateHolder.remindOvulation }
+                LunaToggle(AppStateHolder.remindOvulation) { AppStateHolder.toggleRemindOvulation() }
             }
             SettingRow("Таблетки", "Во время из настроек курса", divider = false) {
-                LunaToggle(AppStateHolder.remindPills) { AppStateHolder.remindPills = !AppStateHolder.remindPills }
+                LunaToggle(AppStateHolder.remindPills) { AppStateHolder.toggleRemindPills() }
             }
         }
 
         // ── приватность ──
         Group("Приватность") {
             SettingRow("Приватный режим", "PIN-код при входе (заглушка MVP)", divider = false) {
-                LunaToggle(AppStateHolder.privateMode) { AppStateHolder.privateMode = !AppStateHolder.privateMode }
+                LunaToggle(AppStateHolder.privateMode) { AppStateHolder.togglePrivateMode() }
             }
         }
 

@@ -9,96 +9,97 @@ import com.kozyrevda.menstrualcalendar.core.model.CycleSettings
 import com.kozyrevda.menstrualcalendar.core.model.DayLog
 import com.kozyrevda.menstrualcalendar.core.model.PillCourse
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 /**
- * Хранилище состояния приложения.
- * MVP: in-memory (пропадает при перезапуске); на этапе БД
- * заменим реализацию на персистентную, интерфейс сохраним.
+ * Единая точка состояния приложения. Каждая мутация сохраняется
+ * в [PersistentStore] — данные переживают перезапуск на Android и iOS.
  */
 object AppStateHolder {
-    var cycleSettings: CycleSettings? by mutableStateOf(null)
 
-    /** Журнал самочувствия по датам. */
-    val dayLogs = mutableStateMapOf<LocalDate, DayLog>()
+    private val store = PersistentStore()
 
     private val chatGreeting = ChatMessage(
         ChatMessage.Role.Luna,
         "Привет! Это Луна. Как ты себя чувствуешь сегодня? Расскажи про настроение, тревогу, ПМС — что угодно, я рядом.",
     )
 
+    var cycleSettings: CycleSettings? by mutableStateOf(null)
+        private set
+
+    /** Журнал самочувствия по датам. */
+    val dayLogs = mutableStateMapOf<LocalDate, DayLog>()
+
     /** История чата с Луной. */
     var chatMessages: List<ChatMessage> by mutableStateOf(listOf(chatGreeting))
+        private set
 
     /** Курс таблеток и отметки приёма. */
     var pillCourse: PillCourse? by mutableStateOf(null)
+        private set
     var pillsTaken: Set<LocalDate> by mutableStateOf(emptySet())
+        private set
 
     /** Premium: пока UI-заглушка без реального billing. */
     var isPremium: Boolean by mutableStateOf(false)
+        private set
 
     /** Напоминания (UI-настройки; сами уведомления — этап нотификаций). */
     var remindPeriod: Boolean by mutableStateOf(true)
+        private set
     var remindOvulation: Boolean by mutableStateOf(true)
+        private set
     var remindPills: Boolean by mutableStateOf(true)
+        private set
 
     /** Приватный режим (PIN-заглушка). */
     var privateMode: Boolean by mutableStateOf(false)
+        private set
 
     val isOnboarded: Boolean get() = cycleSettings != null
 
-    fun activatePremiumStub() {
-        isPremium = true
+    init {
+        restore()
     }
+
+    /* ── мутации (каждая сохраняется) ── */
 
     fun saveCycleSettings(settings: CycleSettings) {
         cycleSettings = settings
+        persist()
     }
 
     fun logFor(date: LocalDate): DayLog? = dayLogs[date]
 
     fun saveDayLog(date: LocalDate, log: DayLog) {
         if (log.isEmpty) dayLogs.remove(date) else dayLogs[date] = log
-    }
-
-    fun savePillCourse(course: PillCourse?) {
-        pillCourse = course
+        persist()
     }
 
     fun appendChatMessage(message: ChatMessage) {
         chatMessages = chatMessages + message
+        persist()
+    }
+
+    fun savePillCourse(course: PillCourse?) {
+        pillCourse = course
+        persist()
     }
 
     fun togglePillTaken(date: LocalDate) {
         pillsTaken = if (date in pillsTaken) pillsTaken - date else pillsTaken + date
+        persist()
     }
 
-    /* ── экспорт и удаление данных ── */
-
-    @Serializable
-    private data class ExportSnapshot(
-        val cycleSettings: com.kozyrevda.menstrualcalendar.core.model.CycleSettings?,
-        val dayLogs: Map<String, DayLog>,
-        val pillCourse: PillCourse?,
-        val pillsTaken: List<String>,
-        val isPremium: Boolean,
-    )
-
-    /** Все данные пользовательницы одним JSON (для экспорта/бэкапа). */
-    fun exportJson(): String {
-        val json = Json { prettyPrint = true; encodeDefaults = true }
-        return json.encodeToString(
-            ExportSnapshot.serializer(),
-            ExportSnapshot(
-                cycleSettings = cycleSettings,
-                dayLogs = dayLogs.entries.associate { it.key.toString() to it.value },
-                pillCourse = pillCourse,
-                pillsTaken = pillsTaken.map { it.toString() }.sorted(),
-                isPremium = isPremium,
-            ),
-        )
+    fun activatePremiumStub() {
+        isPremium = true
+        persist()
     }
+
+    fun toggleRemindPeriod() { remindPeriod = !remindPeriod; persist() }
+    fun toggleRemindOvulation() { remindOvulation = !remindOvulation; persist() }
+    fun toggleRemindPills() { remindPills = !remindPills; persist() }
+    fun togglePrivateMode() { privateMode = !privateMode; persist() }
 
     /** Полное удаление данных: состояние как при первом запуске. */
     fun clearAll() {
@@ -112,5 +113,48 @@ object AppStateHolder {
         remindPills = true
         privateMode = false
         chatMessages = listOf(chatGreeting)
+        store.clear()
+    }
+
+    /* ── экспорт ── */
+
+    /** Все данные пользовательницы одним JSON (для экспорта/бэкапа). */
+    fun exportJson(): String {
+        val json = Json { prettyPrint = true; encodeDefaults = true }
+        return json.encodeToString(PersistentStore.Snapshot.serializer(), snapshot())
+    }
+
+    /* ── персистентность ── */
+
+    private fun snapshot() = PersistentStore.Snapshot(
+        cycleSettings = cycleSettings,
+        dayLogs = dayLogs.entries.associate { it.key.toString() to it.value },
+        pillCourse = pillCourse,
+        pillsTaken = pillsTaken.map { it.toString() }.sorted(),
+        chatMessages = chatMessages,
+        isPremium = isPremium,
+        remindPeriod = remindPeriod,
+        remindOvulation = remindOvulation,
+        remindPills = remindPills,
+        privateMode = privateMode,
+    )
+
+    private fun persist() = store.save(snapshot())
+
+    private fun restore() {
+        val s = store.load()
+        cycleSettings = s.cycleSettings
+        dayLogs.clear()
+        s.dayLogs.forEach { (k, v) ->
+            runCatching { LocalDate.parse(k) }.getOrNull()?.let { dayLogs[it] = v }
+        }
+        pillCourse = s.pillCourse
+        pillsTaken = s.pillsTaken.mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }.toSet()
+        chatMessages = s.chatMessages.ifEmpty { listOf(chatGreeting) }
+        isPremium = s.isPremium
+        remindPeriod = s.remindPeriod
+        remindOvulation = s.remindOvulation
+        remindPills = s.remindPills
+        privateMode = s.privateMode
     }
 }
