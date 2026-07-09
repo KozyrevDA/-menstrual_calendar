@@ -54,3 +54,50 @@ class PillLogicTest {
         assertEquals(1, PillLogic.streak(course, withGap, today))
     }
 }
+
+class PillSchemesTest {
+
+    @Test
+    fun scheme24plus4() {
+        val c = PillCourse(startDate = LocalDate(2026, 6, 1), activePills = 24, breakDays = 4)
+        assertEquals(28, c.packLength)
+        assertEquals(PillStatus.Break, PillLogic.statusOf(LocalDate(2026, 6, 25), c, emptySet(), LocalDate(2026, 6, 1)))
+        assertEquals(1, PillLogic.packDayOf(LocalDate(2026, 6, 29), c))   // новая упаковка
+    }
+
+    @Test
+    fun scheme28continuousHasNoBreak() {
+        val c = PillCourse(startDate = LocalDate(2026, 6, 1), activePills = 28, breakDays = 0)
+        val today = LocalDate(2026, 6, 10)
+        val pack = PillLogic.generatePack(c, emptySet(), today)
+        assertEquals(28, pack.size)
+        assertEquals(0, pack.count { it.status == PillStatus.Break })
+        assertEquals(28, pack.count { it.pillNumber != null })
+    }
+
+    @Test
+    fun missedCount() {
+        val c = PillCourse(startDate = LocalDate(2026, 6, 1))
+        val today = LocalDate(2026, 6, 5)                       // день 5
+        val taken = setOf(LocalDate(2026, 6, 1), LocalDate(2026, 6, 3))
+        val pack = PillLogic.generatePack(c, taken, today)
+        assertEquals(2, pack.count { it.status == PillStatus.Missed })   // 2 и 4 июня
+    }
+}
+
+class ContinuousSchemeTest {
+    private val course = PillCourse(
+        startDate = LocalDate(2026, 6, 1), activePills = 28, breakDays = 0,
+    )
+
+    @Test
+    fun noBreakDaysInContinuousScheme() {
+        val pack = PillLogic.generatePack(course, emptySet(), LocalDate(2026, 6, 10))
+        assertEquals(28, pack.size)
+        assertEquals(0, pack.count { it.status == PillStatus.Break })
+        assertEquals(28, pack.count { it.pillNumber != null })
+        // день 28 → следующая дата = день 1 новой упаковки
+        assertEquals(28, PillLogic.packDayOf(LocalDate(2026, 6, 28), course))
+        assertEquals(1, PillLogic.packDayOf(LocalDate(2026, 6, 29), course))
+    }
+}

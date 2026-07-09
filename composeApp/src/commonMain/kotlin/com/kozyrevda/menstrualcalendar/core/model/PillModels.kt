@@ -11,13 +11,25 @@ data class PillCourse(
     val reminderTime: String = "21:00",     // HH:mm
     val activePills: Int = 21,
     val breakDays: Int = 7,
+    val name: String = "",                  // название препарата (необязательно)
 ) {
     val packLength: Int get() = activePills + breakDays
+
+    /** «21 + 7», «24 + 4», «28 без перерыва». */
+    val schemeLabel: String
+        get() = if (breakDays == 0) "$activePills без перерыва" else "$activePills + $breakDays"
 
     init {
         require(activePills in 1..28) { "activePills вне диапазона" }
         require(breakDays in 0..14) { "breakDays вне диапазона" }
     }
+}
+
+/** Стандартные схемы приёма КОК. */
+enum class PillScheme(val active: Int, val breakDays: Int, val label: String) {
+    Classic21(21, 7, "21 + 7"),
+    Modern24(24, 4, "24 + 4"),
+    Continuous28(28, 0, "28 без перерыва"),
 }
 
 /** Статус дня в блистере. */
