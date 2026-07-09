@@ -145,3 +145,34 @@ fun DatePickerCalendar(selected: LocalDate?, rangeLen: Int, onSelect: (LocalDate
         }
     }
 }
+
+/** Чип-переключатель из прототипа. */
+@Composable
+fun Chip(label: String, on: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .clip(AppShapes.pill)
+            .background(if (on) AppColors.roseLight else AppColors.surface)
+            .border(1.5.dp, if (on) AppColors.rose else AppColors.border, AppShapes.pill)
+            .noRippleClick(onClick)
+            .padding(horizontal = 15.dp, vertical = 9.dp)
+    ) {
+        Text(
+            label, fontSize = 13.5.sp,
+            fontWeight = if (on) FontWeight.ExtraBold else FontWeight.Bold,
+            color = if (on) AppColors.roseDark else AppColors.inkSoft,
+        )
+    }
+}
+
+/** Набор чипов с переносом по [perRow] в строке. */
+@Composable
+fun FlowChips(items: List<String>, selected: Set<String>, perRow: Int = 3, onToggle: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        items.chunked(perRow).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                row.forEach { Chip(it, it in selected) { onToggle(it) } }
+            }
+        }
+    }
+}

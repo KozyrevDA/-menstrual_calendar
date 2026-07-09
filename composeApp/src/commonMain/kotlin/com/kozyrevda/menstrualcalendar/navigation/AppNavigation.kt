@@ -39,10 +39,12 @@ fun AppNavigation() {
                 Screen.Home -> HomeScreen(onOpen = { screen ->
                     if (screen in Screen.tabs) navigator.switchTab(screen) else navigator.navigate(screen)
                 })
-                Screen.Calendar -> CalendarScreen()
+                Screen.Calendar -> CalendarScreen(onLogDay = { date ->
+                    navigator.navigate(Screen.LogSymptoms(isoDate = date.toString()))
+                })
                 Screen.Stats -> StatsScreen()
                 Screen.Settings -> SettingsScreen()
-                is Screen.LogSymptoms -> LogSymptomsScreen(onBack = navigator::back)
+                is Screen.LogSymptoms -> LogSymptomsScreen(isoDate = current.isoDate, onBack = navigator::back)
                 Screen.Pills -> PillsScreen(onBack = navigator::back)
                 Screen.LunaChat -> LunaChatScreen(onBack = navigator::back)
                 Screen.Paywall -> PaywallScreen(onBack = navigator::back)

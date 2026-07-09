@@ -49,7 +49,7 @@ import com.kozyrevda.menstrualcalendar.theme.AppShapes
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun CalendarScreen() {
+fun CalendarScreen(onLogDay: (LocalDate) -> Unit = {}) {
     val t = today()
     val settings = AppStateHolder.cycleSettings
     var year by remember { mutableStateOf(t.year) }
@@ -104,6 +104,7 @@ fun CalendarScreen() {
                                 info = settings?.let { CyclePredictor.getDayInfo(date, it) },
                                 isToday = date == t,
                                 isSelected = date == selected,
+                                hasLog = AppStateHolder.dayLogs.containsKey(date),
                                 modifier = Modifier.weight(1f),
                             ) { selected = if (selected == date) null else date }
                         }
@@ -127,7 +128,7 @@ fun CalendarScreen() {
         val sel = selected
         if (sel != null && settings != null) {
             val info = CyclePredictor.getDayInfo(sel, settings)
-            DayInfoCard(sel, info)
+            DayInfoCard(sel, info, onLog = { onLogDay(sel) })
         } else {
             Text(
                 "Нажмите на день, чтобы увидеть информацию о нём",
@@ -145,6 +146,7 @@ private fun DayCell(
     info: CycleDayInfo?,
     isToday: Boolean,
     isSelected: Boolean,
+    hasLog: Boolean,
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
@@ -162,6 +164,13 @@ private fun DayCell(
     if (isSelected && !isToday) m = m.border(2.dp, AppColors.subLight, AppShapes.day)
 
     Box(m.noRippleClick(onClick), contentAlignment = Alignment.Center) {
+        if (hasLog && inMonth) {
+            Box(
+                Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp)
+                    .size(4.dp).clip(CircleShape)
+                    .background(if (isPeriod) Color.White else AppColors.roseDark)
+            )
+        }
         Text(
             "${date.dayOfMonth}",
             fontSize = 15.sp,
@@ -186,7 +195,7 @@ private fun Legend(label: String, dot: @Composable () -> Unit) {
 }
 
 @Composable
-private fun DayInfoCard(date: LocalDate, info: CycleDayInfo) {
+private fun DayInfoCard(date: LocalDate, info: CycleDayInfo, onLog: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(AppShapes.cardSmall).background(AppColors.roseLight)
             .padding(horizontal = 20.dp, vertical = 18.dp),
@@ -198,5 +207,21 @@ private fun DayInfoCard(date: LocalDate, info: CycleDayInfo) {
         )
         Text(info.statusTitle(), style = MaterialTheme.typography.titleLarge, color = AppColors.ink)
         Text(info.statusSubtitle(), style = MaterialTheme.typography.bodyMedium, color = AppColors.roseInk)
+        val log = AppStateHolder.logFor(date)
+        if (log != null) {
+            Text(
+                (log.mood + log.symptoms).joinToString(" · ") + if (log.note.isNotBlank()) " · «${log.note}»" else "",
+                style = MaterialTheme.typography.labelMedium, color = AppColors.roseDark,
+            )
+        }
+        Box(
+            Modifier.padding(top = 8.dp).clip(AppShapes.pill).background(AppColors.rose)
+                .noRippleClick(onLog).padding(horizontal = 18.dp, vertical = 10.dp)
+        ) {
+            Text(
+                if (log == null) "Отметить самочувствие" else "Изменить запись",
+                fontSize = 13.5.sp, fontWeight = FontWeight.ExtraBold, color = Color.White,
+            )
+        }
     }
 }
