@@ -27,6 +27,9 @@ fun AppNavigation() {
     val current = navigator.current
     val showBottomBar = current in Screen.tabs
 
+    // системный «Назад» (Android): закрываем оверлей, а не приложение
+    PlatformBackHandler(enabled = navigator.canGoBack) { navigator.back() }
+
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f)) {
             when (current) {
