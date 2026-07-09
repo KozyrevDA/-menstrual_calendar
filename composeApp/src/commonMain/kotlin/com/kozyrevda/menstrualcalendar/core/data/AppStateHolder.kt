@@ -9,6 +9,8 @@ import com.kozyrevda.menstrualcalendar.core.model.CycleSettings
 import com.kozyrevda.menstrualcalendar.core.model.DayLog
 import com.kozyrevda.menstrualcalendar.core.model.PillCourse
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /**
  * Хранилище состояния приложения.
@@ -21,15 +23,13 @@ object AppStateHolder {
     /** Журнал самочувствия по датам. */
     val dayLogs = mutableStateMapOf<LocalDate, DayLog>()
 
-    /** История чата с Луной. */
-    var chatMessages: List<ChatMessage> by mutableStateOf(
-        listOf(
-            ChatMessage(
-                ChatMessage.Role.Luna,
-                "Привет! Это Луна. Как ты себя чувствуешь сегодня? Расскажи про настроение, тревогу, ПМС — что угодно, я рядом.",
-            )
-        )
+    private val chatGreeting = ChatMessage(
+        ChatMessage.Role.Luna,
+        "Привет! Это Луна. Как ты себя чувствуешь сегодня? Расскажи про настроение, тревогу, ПМС — что угодно, я рядом.",
     )
+
+    /** История чата с Луной. */
+    var chatMessages: List<ChatMessage> by mutableStateOf(listOf(chatGreeting))
 
     /** Курс таблеток и отметки приёма. */
     var pillCourse: PillCourse? by mutableStateOf(null)
@@ -37,6 +37,14 @@ object AppStateHolder {
 
     /** Premium: пока UI-заглушка без реального billing. */
     var isPremium: Boolean by mutableStateOf(false)
+
+    /** Напоминания (UI-настройки; сами уведомления — этап нотификаций). */
+    var remindPeriod: Boolean by mutableStateOf(true)
+    var remindOvulation: Boolean by mutableStateOf(true)
+    var remindPills: Boolean by mutableStateOf(true)
+
+    /** Приватный режим (PIN-заглушка). */
+    var privateMode: Boolean by mutableStateOf(false)
 
     val isOnboarded: Boolean get() = cycleSettings != null
 
@@ -64,5 +72,45 @@ object AppStateHolder {
 
     fun togglePillTaken(date: LocalDate) {
         pillsTaken = if (date in pillsTaken) pillsTaken - date else pillsTaken + date
+    }
+
+    /* ── экспорт и удаление данных ── */
+
+    @Serializable
+    private data class ExportSnapshot(
+        val cycleSettings: com.kozyrevda.menstrualcalendar.core.model.CycleSettings?,
+        val dayLogs: Map<String, DayLog>,
+        val pillCourse: PillCourse?,
+        val pillsTaken: List<String>,
+        val isPremium: Boolean,
+    )
+
+    /** Все данные пользовательницы одним JSON (для экспорта/бэкапа). */
+    fun exportJson(): String {
+        val json = Json { prettyPrint = true; encodeDefaults = true }
+        return json.encodeToString(
+            ExportSnapshot.serializer(),
+            ExportSnapshot(
+                cycleSettings = cycleSettings,
+                dayLogs = dayLogs.entries.associate { it.key.toString() to it.value },
+                pillCourse = pillCourse,
+                pillsTaken = pillsTaken.map { it.toString() }.sorted(),
+                isPremium = isPremium,
+            ),
+        )
+    }
+
+    /** Полное удаление данных: состояние как при первом запуске. */
+    fun clearAll() {
+        cycleSettings = null
+        dayLogs.clear()
+        pillCourse = null
+        pillsTaken = emptySet()
+        isPremium = false
+        remindPeriod = true
+        remindOvulation = true
+        remindPills = true
+        privateMode = false
+        chatMessages = listOf(chatGreeting)
     }
 }

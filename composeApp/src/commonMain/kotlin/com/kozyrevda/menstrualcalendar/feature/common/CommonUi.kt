@@ -176,3 +176,19 @@ fun RadioRow(label: String, on: Boolean, onClick: () -> Unit) {
 }
 
 /** Прозрачная текстовая кнопка. */
+
+/** Переключатель в стиле прототипа. */
+@Composable
+fun LunaToggle(on: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .size(width = 46.dp, height = 27.dp)
+            .clip(AppShapes.pill)
+            .background(if (on) AppColors.rose else Color(0xFFEBD9D5))
+            .noRippleClick(onClick)
+            .padding(3.dp),
+        contentAlignment = if (on) Alignment.CenterEnd else Alignment.CenterStart,
+    ) {
+        Box(Modifier.size(21.dp).shadow(2.dp, CircleShape).clip(CircleShape).background(Color.White))
+    }
+}

@@ -43,7 +43,9 @@ fun AppNavigation() {
                     navigator.navigate(Screen.LogSymptoms(isoDate = date.toString()))
                 })
                 Screen.Stats -> StatsScreen()
-                Screen.Settings -> SettingsScreen()
+                Screen.Settings -> SettingsScreen(onDataDeleted = {
+                    navigator.replaceAll(Screen.Onboarding)
+                })
                 is Screen.LogSymptoms -> LogSymptomsScreen(isoDate = current.isoDate, onBack = navigator::back)
                 Screen.Pills -> PillsScreen(onBack = navigator::back)
                 Screen.LunaChat -> LunaChatScreen(onBack = navigator::back)
