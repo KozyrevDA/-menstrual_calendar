@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.kozyrevda.menstrualcalendar.core.model.CycleSettings
 import com.kozyrevda.menstrualcalendar.core.model.DayLog
+import com.kozyrevda.menstrualcalendar.core.model.PillCourse
 import kotlinx.datetime.LocalDate
 
 /**
@@ -19,6 +20,10 @@ object AppStateHolder {
     /** Журнал самочувствия по датам. */
     val dayLogs = mutableStateMapOf<LocalDate, DayLog>()
 
+    /** Курс таблеток и отметки приёма. */
+    var pillCourse: PillCourse? by mutableStateOf(null)
+    var pillsTaken: Set<LocalDate> by mutableStateOf(emptySet())
+
     val isOnboarded: Boolean get() = cycleSettings != null
 
     fun saveCycleSettings(settings: CycleSettings) {
@@ -29,5 +34,13 @@ object AppStateHolder {
 
     fun saveDayLog(date: LocalDate, log: DayLog) {
         if (log.isEmpty) dayLogs.remove(date) else dayLogs[date] = log
+    }
+
+    fun savePillCourse(course: PillCourse?) {
+        pillCourse = course
+    }
+
+    fun togglePillTaken(date: LocalDate) {
+        pillsTaken = if (date in pillsTaken) pillsTaken - date else pillsTaken + date
     }
 }
