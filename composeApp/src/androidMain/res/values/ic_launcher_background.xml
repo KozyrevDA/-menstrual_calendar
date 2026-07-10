@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- тёмный «чернильный» фон иконки из палитры прототипа -->
+    <color name="ic_launcher_background">#45262C</color>
+</resources>
