@@ -29,6 +29,10 @@ object AppStateHolder {
     var onboardingCompleted: Boolean by mutableStateOf(false)
         private set
 
+    /** Принят ли дисклеймер чата с Луной. */
+    var lunaDisclaimerAccepted: Boolean by mutableStateOf(false)
+        private set
+
     var cycleSettings: CycleSettings? by mutableStateOf(null)
         private set
 
@@ -68,6 +72,11 @@ object AppStateHolder {
     }
 
     /* ── мутации (каждая сохраняется) ── */
+
+    fun acceptLunaDisclaimer() {
+        lunaDisclaimerAccepted = true
+        persist()
+    }
 
     /** Завершение онбординга: сохраняет настройки и поднимает флаг. */
     fun completeOnboarding(settings: CycleSettings) {
@@ -117,6 +126,7 @@ object AppStateHolder {
     /** Полное удаление данных: состояние как при первом запуске. */
     fun clearAll() {
         onboardingCompleted = false
+        lunaDisclaimerAccepted = false
         cycleSettings = null
         dayLogs.clear()
         pillCourse = null
@@ -142,6 +152,7 @@ object AppStateHolder {
 
     private fun snapshot() = PersistentStore.Snapshot(
         onboardingCompleted = onboardingCompleted,
+        lunaDisclaimerAccepted = lunaDisclaimerAccepted,
         cycleSettings = cycleSettings,
         dayLogs = dayLogs.entries.associate { it.key.toString() to it.value },
         pillCourse = pillCourse,
@@ -160,6 +171,7 @@ object AppStateHolder {
         val s = store.load()
         // миграция со старых снапшотов: раньше факт онбординга выводился из наличия настроек
         onboardingCompleted = s.onboardingCompleted || s.cycleSettings != null
+        lunaDisclaimerAccepted = s.lunaDisclaimerAccepted
         cycleSettings = s.cycleSettings
         dayLogs.clear()
         s.dayLogs.forEach { (k, v) ->

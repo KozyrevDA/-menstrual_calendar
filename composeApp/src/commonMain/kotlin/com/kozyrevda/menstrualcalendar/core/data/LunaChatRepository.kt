@@ -22,5 +22,6 @@ const val LUNA_SYSTEM_PROMPT =
     "Поддерживаешь, задаешь бережные вопросы, помогаешь вести дневник чувств."
 
 /** Фабрика: реальный API, если сконфигурирован, иначе mock. */
-fun createLunaChatRepository(): LunaChatRepository =
+fun createLunaChatRepository(): LunaChatRepository = SafeLunaChatRepository(
     if (KtorLunaChatRepository.isConfigured) KtorLunaChatRepository() else MockLunaChatRepository()
+)
