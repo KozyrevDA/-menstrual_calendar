@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- INTERNET нужен только чату «Луна» (Ktor-клиент к ИИ-API).
+         С mock-репозиторием сеть не используется; при удалении чата
+         из сборки это разрешение можно убрать. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:label="Луна"
+        android:label="Календарь месячных"
+        android:allowBackup="false"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
@@ -16,4 +22,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
