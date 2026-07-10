@@ -42,7 +42,7 @@ import com.kozyrevda.menstrualcalendar.theme.AppShapes
 
 private enum class Plan(val title: String, val price: String, val note: String) {
     Month("Месяц", "299 ₽ / месяц", "Гибко, можно отменить в любой момент"),
-    Year("Год", "2 490 ₽ / год", "≈ 208 ₽ в месяц"),
+    Year("Год", "2 490 ₽ / год", "≈ 208 ₽ в месяц · рекомендуем"),
 }
 
 private val BENEFITS = listOf(
@@ -53,8 +53,12 @@ private val BENEFITS = listOf(
     "Backup — резервная копия данных",
 )
 
+private const val TERMS_URL = "https://kozyrevda.github.io/-menstrual_calendar/terms"
+private const val PRIVACY_URL = "https://kozyrevda.github.io/-menstrual_calendar/privacy"
+
 @Composable
 fun PaywallScreen(onBack: () -> Unit) {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     var plan by remember { mutableStateOf(Plan.Year) }
     var purchased by remember { mutableStateOf(AppStateHolder.isPremium) }
 
@@ -102,12 +106,12 @@ fun PaywallScreen(onBack: () -> Unit) {
                 }
             }
 
-            // ── тарифы ──
-            Plan.entries.forEach { p ->
+            // ── тарифы: годовой — главный ──
+            listOf(Plan.Year, Plan.Month).forEach { p ->
                 PlanCard(
                     plan = p,
                     selected = plan == p,
-                    badge = if (p == Plan.Year) "Выгодно −31%" else null,
+                    badge = if (p == Plan.Year) "Экономия 30%" else null,
                 ) { plan = p }
             }
 
@@ -134,6 +138,14 @@ fun PaywallScreen(onBack: () -> Unit) {
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
             )
             GhostButton("Восстановить покупки") { /* заглушка без billing */ }
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+            ) {
+                LegalLink("Условия использования") { runCatching { uriHandler.openUri(TERMS_URL) } }
+                Text("·", style = MaterialTheme.typography.labelMedium, color = AppColors.subLight)
+                LegalLink("Политика конфиденциальности") { runCatching { uriHandler.openUri(PRIVACY_URL) } }
+            }
         }
     }
 }
@@ -188,4 +200,15 @@ private fun SuccessContent(onBack: () -> Unit) {
     }
     Spacer(Modifier.height(10.dp))
     Cta("Отлично") { onBack() }
+}
+
+@Composable
+private fun LegalLink(label: String, onClick: () -> Unit) {
+    Text(
+        label,
+        style = MaterialTheme.typography.labelMedium,
+        color = AppColors.sub,
+        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+        modifier = Modifier.noRippleClick(onClick),
+    )
 }
