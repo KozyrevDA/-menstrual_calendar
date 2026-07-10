@@ -49,8 +49,8 @@ import com.kozyrevda.menstrualcalendar.theme.AppShapes
 import kotlinx.datetime.LocalDate
 
 private const val MEDICAL_WARNING =
-    "Приложение только напоминает о приёме и не даёт медицинских рекомендаций. " +
-        "По вопросам подбора и приёма препарата обращайтесь к врачу."
+    "Приложение только напоминает о приёме. " +
+        "Следуйте назначению врача и инструкции к препарату."
 
 @Composable
 fun PillsScreen(onBack: () -> Unit) {

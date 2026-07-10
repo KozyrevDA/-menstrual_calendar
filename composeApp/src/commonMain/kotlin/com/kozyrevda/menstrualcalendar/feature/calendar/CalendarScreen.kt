@@ -136,6 +136,14 @@ fun CalendarScreen(onLogDay: (LocalDate) -> Unit = {}) {
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             )
         }
+
+        Text(
+            "Фертильные дни рассчитаны приблизительно на основе введённых данных. " +
+                "Не используйте прогноз как единственный способ предотвращения беременности.",
+            style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+            color = AppColors.subLight, lineHeight = 17.sp,
+            modifier = Modifier.padding(horizontal = 6.dp),
+        )
     }
 }
 
