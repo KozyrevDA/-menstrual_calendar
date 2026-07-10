@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -52,6 +53,15 @@ kotlin {
     }
 }
 
+// Release-подпись: значения читаются из локального keystore.properties
+// (в .gitignore; шаблон — keystore.properties.example). Секретов в Gradle нет.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 android {
     namespace = "com.kozyrevda.menstrualcalendar"
     compileSdk = 35
@@ -66,7 +76,38 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
     buildTypes {
-        release { isMinifyEnabled = false }
+        release {
+            isMinifyEnabled = false
+            // без keystore.properties debug-сборка работает как раньше,
+            // а release останавливается с понятной ошибкой (см. задачу ниже)
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                null
+            }
+        }
+    }
+}
+
+// Понятная ошибка при попытке release-сборки без конфигурации подписи.
+tasks.configureEach {
+    if (name == "assembleRelease" || name == "bundleRelease") {
+        doFirst {
+            check(keystorePropertiesFile.exists()) {
+                "Release-подпись не настроена: создайте keystore.properties в корне проекта " +
+                    "по образцу keystore.properties.example (инструкция — в README, раздел «Release-подпись»)."
+            }
+        }
     }
 }

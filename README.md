@@ -30,6 +30,34 @@ APK: `composeApp/build/outputs/apk/debug/composeApp-debug.apk`
 CI: GitHub Actions (`.github/workflows/android.yml`) на каждый push в `main`
 прогоняет тесты, собирает debug-APK и прикладывает его артефактом `luna-debug-apk`.
 
+### Release-подпись (для RuStore)
+
+1. Сгенерируйте keystore (один раз, файл храните вне репозитория и сделайте резервную копию —
+   потеря ключа означает невозможность обновлять приложение):
+
+```bash
+keytool -genkeypair \
+  -v \
+  -keystore menstrual-calendar-release.jks \
+  -alias release \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000
+```
+
+2. Скопируйте `keystore.properties.example` в `keystore.properties` (он в `.gitignore`)
+   и заполните путь к keystore и пароли.
+3. Соберите подписанный релиз:
+
+```bash
+./gradlew :composeApp:assembleRelease
+# APK: composeApp/build/outputs/apk/release/composeApp-release.apk
+```
+
+Без `keystore.properties` debug-сборка работает как обычно, а release
+останавливается с подсказкой. Файлы `*.jks`, `*.keystore` и `keystore.properties`
+в Git не попадают.
+
 ### iOS (нужен macOS + Xcode)
 ```bash
 brew install xcodegen
