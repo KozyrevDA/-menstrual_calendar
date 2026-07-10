@@ -19,13 +19,9 @@ data class CycleSettings(
     val cycleLengthDays: Int = 28,
     val periodLengthDays: Int = 5,
     val lutealPhaseDays: Int = 14,
-) {
-    init {
-        require(cycleLengthDays in 15..60) { "cycleLengthDays вне разумного диапазона" }
-        require(periodLengthDays in 1..14) { "periodLengthDays вне разумного диапазона" }
-        require(lutealPhaseDays in 7..20) { "lutealPhaseDays вне разумного диапазона" }
-    }
-}
+)
+// Диапазоны значений контролируются вводом в UI и санитизацией
+// (core/logic/Sanitize.kt) при восстановлении из хранилища.
 
 /** Расчётная информация об одном дне цикла. */
 data class CycleDayInfo(

@@ -8,6 +8,8 @@ import com.kozyrevda.menstrualcalendar.core.model.ChatMessage
 import com.kozyrevda.menstrualcalendar.core.model.CycleSettings
 import com.kozyrevda.menstrualcalendar.core.model.DayLog
 import com.kozyrevda.menstrualcalendar.core.model.PillCourse
+import com.kozyrevda.menstrualcalendar.core.logic.sanitized
+import com.kozyrevda.menstrualcalendar.core.logic.today
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 
@@ -80,14 +82,14 @@ object AppStateHolder {
 
     /** Завершение онбординга: сохраняет настройки и поднимает флаг. */
     fun completeOnboarding(settings: CycleSettings) {
-        cycleSettings = settings
+        cycleSettings = settings.sanitized(today())
         onboardingCompleted = true
         persist()
     }
 
     /** Правка параметров цикла из настроек (флаг онбординга не трогает). */
     fun saveCycleSettings(settings: CycleSettings) {
-        cycleSettings = settings
+        cycleSettings = settings.sanitized(today())
         persist()
     }
 
@@ -104,7 +106,7 @@ object AppStateHolder {
     }
 
     fun savePillCourse(course: PillCourse?) {
-        pillCourse = course
+        pillCourse = course?.sanitized(today())
         persist()
     }
 
@@ -170,14 +172,15 @@ object AppStateHolder {
     private fun restore() {
         val s = store.load()
         // миграция со старых снапшотов: раньше факт онбординга выводился из наличия настроек
+        val t = today()
         onboardingCompleted = s.onboardingCompleted || s.cycleSettings != null
         lunaDisclaimerAccepted = s.lunaDisclaimerAccepted
-        cycleSettings = s.cycleSettings
+        cycleSettings = s.cycleSettings?.sanitized(t)
         dayLogs.clear()
         s.dayLogs.forEach { (k, v) ->
             runCatching { LocalDate.parse(k) }.getOrNull()?.let { dayLogs[it] = v }
         }
-        pillCourse = s.pillCourse
+        pillCourse = s.pillCourse?.sanitized(t)
         pillsTaken = s.pillsTaken.mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }.toSet()
         chatMessages = s.chatMessages.ifEmpty { listOf(chatGreeting) }
         isPremium = s.isPremium
