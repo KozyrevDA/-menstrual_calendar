@@ -88,7 +88,12 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             // без keystore.properties debug-сборка работает как раньше,
             // а release останавливается с понятной ошибкой (см. задачу ниже)
             signingConfig = if (keystorePropertiesFile.exists()) {
@@ -104,6 +109,7 @@ android {
 tasks.configureEach {
     if (name == "assembleRelease" || name == "bundleRelease") {
         doFirst {
+            if (project.findProperty("ci.unsigned") == "true") return@doFirst
             check(keystorePropertiesFile.exists()) {
                 "Release-подпись не настроена: создайте keystore.properties в корне проекта " +
                     "по образцу keystore.properties.example (инструкция — в README, раздел «Release-подпись»)."

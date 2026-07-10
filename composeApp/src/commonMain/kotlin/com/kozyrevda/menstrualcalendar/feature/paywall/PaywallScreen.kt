@@ -61,6 +61,7 @@ fun PaywallScreen(onBack: () -> Unit) {
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     var plan by remember { mutableStateOf(Plan.Year) }
     var purchased by remember { mutableStateOf(AppStateHolder.isPremium) }
+    var billingNotice by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
         Row(
@@ -128,9 +129,22 @@ fun PaywallScreen(onBack: () -> Unit) {
             }
 
             Spacer(Modifier.height(2.dp))
-            Cta("Попробовать 3 дня за 1 ₽") {
-                AppStateHolder.activatePremiumStub()   // заглушка вместо billing
-                purchased = true
+            // TODO(billing): заменить на реальную покупку через RuStore Billing SDK.
+            // Mock-активация Premium убрана из публичного UI (release-требование);
+            // AppStateHolder.activatePremiumStub() остаётся для будущей интеграции.
+            Cta("Попробовать 3 дня за 1 ₽") { billingNotice = true }
+            if (billingNotice) {
+                Box(
+                    Modifier.fillMaxWidth().clip(AppShapes.tile).background(AppColors.peachLight)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Text(
+                        "Оплата подключается вместе с публикацией в RuStore — " +
+                            "в тестовой версии подписка недоступна.",
+                        style = MaterialTheme.typography.labelMedium, color = AppColors.peachText,
+                        textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
             Text(
                 "Затем ${plan.price.lowercase()}. Отмена в любой момент в настройках подписки.",
