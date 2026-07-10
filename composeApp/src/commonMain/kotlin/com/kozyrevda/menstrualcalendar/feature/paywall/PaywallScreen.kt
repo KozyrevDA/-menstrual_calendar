@@ -53,8 +53,8 @@ private val BENEFITS = listOf(
     "Backup — резервная копия данных",
 )
 
-private const val TERMS_URL = "https://kozyrevda.github.io/-menstrual_calendar/terms"
-private const val PRIVACY_URL = "https://kozyrevda.github.io/-menstrual_calendar/privacy"
+private const val TERMS_URL = "https://kozyrevda.github.io/-menstrual_calendar/terms.html"
+private const val PRIVACY_URL = "https://kozyrevda.github.io/-menstrual_calendar/privacy.html"
 
 @Composable
 fun PaywallScreen(onBack: () -> Unit) {

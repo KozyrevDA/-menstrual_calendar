@@ -40,7 +40,7 @@ import com.kozyrevda.menstrualcalendar.feature.common.noRippleClick
 import com.kozyrevda.menstrualcalendar.theme.AppColors
 import com.kozyrevda.menstrualcalendar.theme.AppShapes
 
-private const val PRIVACY_POLICY_URL = "https://kozyrevda.github.io/-menstrual_calendar/privacy"
+private const val PRIVACY_POLICY_URL = "https://kozyrevda.github.io/-menstrual_calendar/privacy.html"
 
 @Composable
 fun SettingsScreen(onDataDeleted: () -> Unit = {}) {
