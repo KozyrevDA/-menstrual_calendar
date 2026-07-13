@@ -35,6 +35,19 @@ jobs:
           set -o pipefail
           ./gradlew :composeApp:assembleDebug 2>&1 | tee build-apk.log
 
+      - name: Verify R8 release build (unsigned)
+        run: |
+          set -o pipefail
+          ./gradlew :composeApp:assembleRelease -Pci.unsigned=true 2>&1 | tee build-release.log
+          ls -la composeApp/build/outputs/apk/release/
+
+      - name: Upload unsigned release (R8 size check)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-unsigned-r8-check
+          path: composeApp/build/outputs/apk/release/*.apk
+          retention-days: 7
+
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
