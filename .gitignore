@@ -9,3 +9,8 @@ captures/
 .kotlin/
 xcuserdata/
 iosApp/Pods/
+
+# release signing — НИКОГДА не коммитить
+*.jks
+*.keystore
+keystore.properties

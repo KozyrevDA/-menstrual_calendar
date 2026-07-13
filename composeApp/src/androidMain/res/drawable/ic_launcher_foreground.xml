@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- фоновое кольцо -->
+    <path
+        android:pathData="M54,28 A26,26 0 1,1 53.98,28 Z"
+        android:strokeColor="#5E3B42"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- дуга прогресса цикла: от верха по часовой на 270° -->
+    <path
+        android:pathData="M54,28 A26,26 0 1,1 28,54"
+        android:strokeColor="#E4677F"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- маркер «сегодня» -->
+    <path
+        android:pathData="M54,28 m-5.5,0 a5.5,5.5 0 1,1 11,0 a5.5,5.5 0 1,1 -11,0"
+        android:fillColor="#F6C79E" />
+</vector>

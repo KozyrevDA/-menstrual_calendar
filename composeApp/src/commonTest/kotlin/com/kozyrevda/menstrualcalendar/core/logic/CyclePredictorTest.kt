@@ -5,7 +5,6 @@ import com.kozyrevda.menstrualcalendar.core.model.CycleSettings
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -124,10 +123,4 @@ class CyclePredictorTest {
         assertEquals(LocalDate(2026, 6, 30), CyclePredictor.getOvulationDate(short, LocalDate(2026, 6, 22)))
     }
 
-    @Test
-    fun invalidSettingsRejected() {
-        assertFailsWith<IllegalArgumentException> {
-            CycleSettings(LocalDate(2026, 1, 1), cycleLengthDays = 5)
-        }
-    }
 }

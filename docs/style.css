@@ -1,0 +1,16 @@
+:root { --bg:#FFF9F6; --ink:#45262C; --sub:#A17A80; --rose:#E4677F; --rose-dark:#C9506B;
+        --rose-light:#FBE3E9; --border:#F0DCD6; --peach-light:#FCEBDC; --peach-ink:#B4632F; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+       font:16px/1.65 "Nunito","Segoe UI",system-ui,sans-serif; }
+main { max-width:760px; margin:0 auto; padding:32px 20px 64px; }
+h1 { font-size:30px; font-weight:900; margin:8px 0 4px; }
+h2 { font-size:20px; font-weight:800; margin:32px 0 8px; }
+p, li { color:#6B4A50; font-weight:600; }
+.sub { color:var(--sub); margin-top:0; }
+a { color:var(--rose-dark); font-weight:800; }
+.card { background:#fff; border:1.5px solid var(--border); border-radius:22px; padding:18px 22px; margin:16px 0; }
+.note { background:var(--peach-light); color:var(--peach-ink); border-radius:16px; padding:12px 16px; font-weight:700; }
+nav { margin-bottom:24px; } nav a { margin-right:14px; font-size:14px; }
+footer { margin-top:48px; font-size:13px; color:var(--sub); }
+code { background:var(--rose-light); border-radius:8px; padding:1px 7px; }

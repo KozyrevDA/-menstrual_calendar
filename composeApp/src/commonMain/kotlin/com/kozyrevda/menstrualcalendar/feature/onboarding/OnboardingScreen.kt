@@ -128,6 +128,13 @@ fun OnboardingScreen(onFinish: (CycleSettings) -> Unit) {
                             style = MaterialTheme.typography.labelMedium, color = AppColors.peachText, lineHeight = 18.sp,
                         )
                     }
+                    Text(
+                        "Приложение помогает вести личный календарь и показывает ориентировочные " +
+                            "прогнозы. Оно не заменяет консультацию врача и не должно использоваться " +
+                            "как метод контрацепции.",
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+                        color = AppColors.subLight, lineHeight = 17.sp,
+                    )
                 }
             }
         }

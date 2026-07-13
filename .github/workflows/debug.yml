@@ -1,12 +1,13 @@
-name: Android CI
+name: Debug CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'release/**' ]
+  pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write   # отчёт об ошибках сборки комментарием к коммиту
 
 jobs:
   build:
@@ -27,14 +28,27 @@ jobs:
       - name: Unit tests
         run: |
           set -o pipefail
-          ./gradlew :composeApp:testDebugUnitTest --stacktrace 2>&1 | tee build-tests.log
+          ./gradlew :composeApp:test --stacktrace 2>&1 | tee build-tests.log
 
       - name: Build debug APK
         run: |
           set -o pipefail
           ./gradlew :composeApp:assembleDebug 2>&1 | tee build-apk.log
 
-      - name: Upload APK artifact
+      - name: Verify R8 release build (unsigned)
+        run: |
+          set -o pipefail
+          ./gradlew :composeApp:assembleRelease -Pci.unsigned=true 2>&1 | tee build-release.log
+          ls -la composeApp/build/outputs/apk/release/
+
+      - name: Upload unsigned release (R8 size check)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-unsigned-r8-check
+          path: composeApp/build/outputs/apk/release/*.apk
+          retention-days: 7
+
+      - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: luna-debug-apk-v0.1.0-build${{ github.run_number }}
@@ -43,14 +57,14 @@ jobs:
           retention-days: 30
 
       - name: Report failure as commit comment
-        if: failure()
+        if: failure() && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
             echo '### CI failure — key errors'
             echo '```'
-            grep -E "^e: |error:|> Task .* FAILED|What went wrong|Caused by:|Unresolved reference|expecting" \
+            grep -E "^e: |error:|> Task .* FAILED|What went wrong|Caused by:|Unresolved reference" \
               -h build-*.log 2>/dev/null | head -c 5000 || true
             echo
             echo '--- tail ---'

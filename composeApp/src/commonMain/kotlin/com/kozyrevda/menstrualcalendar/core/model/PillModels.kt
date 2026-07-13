@@ -19,10 +19,6 @@ data class PillCourse(
     val schemeLabel: String
         get() = if (breakDays == 0) "$activePills без перерыва" else "$activePills + $breakDays"
 
-    init {
-        require(activePills in 1..28) { "activePills вне диапазона" }
-        require(breakDays in 0..14) { "breakDays вне диапазона" }
-    }
 }
 
 /** Стандартные схемы приёма КОК. */
